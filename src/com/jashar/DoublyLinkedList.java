@@ -12,6 +12,7 @@ import java.util.Iterator;
  * @author Jashar
  * @param <E>
  */
+
 /*
 Your assignment is to implement the Doubly Linked List for generic types.
         Your class needs to have the following methods:
@@ -26,94 +27,12 @@ Your assignment is to implement the Doubly Linked List for generic types.
         //    • count – returning the size of the list
             Use the code from the lecture as your reference
  */
-public class LinkedList<E> implements Iterable<E> {
+public class DoublyLinkedList<E> implements Iterable<E> {
 
     private Node first;
 
     /**
-     * removes the element from the rear
-     */
-    void removeFromRear() {
-        Node current = this.first;
-
-        if (this.first == null) {
-            return;
-        } else if (this.first.getNext() == null) {
-            this.first = null;
-            return;
-        } else if (this.first.getNext().getNext() == null) {
-            this.first.getNext().setNext(null);
-            return;
-        }
-
-        while (current.getNext().getNext() != null) {
-            current = current.getNext();
-        }
-        current.setNext(null);
-    }
-
-    /**
-     * remove the first element in the list
-     */
-    void removeFromFront() {
-        if (this.first != null) {
-            this.first = this.first.getNext();
-        }
-    }
-
-    /**
-     * get the first element of the list
-     *
-     * @return
-     */
-    Node getFirst() {
-        return this.first;
-    }
-
-    /**
-     * add first element to list, if list empty
-     *
-     * @param element
-     */
-    void setFirst(E element) {
-        addToFront(element);
-    }
-
-    /**
-     * add the element to the beginning of the list
-     *
-     * @param element
-     */
-    void addToFront(E element) {
-        if (this.first == null) {
-            this.first = new Node(element);
-        } else {
-            Node firstT = this.first;
-            this.first = new Node(element);
-            this.first.setNext(firstT);
-        }
-    }
-
-    /**
-     * add the element to the rear of the list
-     *
-     * @param element
-     */
-    void addToRear(E element) {
-        if (this.first == null) {
-            this.first = new Node(element);
-        } else {
-            Node current = first;
-            while (current.getNext() != null) {
-                current = current.getNext();
-            }
-            current.setNext(new Node(element));
-
-        }
-    }
-
-    /**
-     * add the element at the required index
+     * add element at the index
      *
      * @param element
      * @param index
@@ -135,10 +54,14 @@ public class LinkedList<E> implements Iterable<E> {
                 Node current = this.first;
                 while (current != null) {
                     if (count + 1 == index) {
-                        Node next = current.getNext();
+                        Node afterIndex = current.getNext();
                         Node newNode = new Node(element);
                         current.setNext(newNode);
-                        newNode.setNext(next);
+                        newNode.setPrev(current);
+                        newNode.setNext(afterIndex);
+                        if (afterIndex != null) {
+                            afterIndex.setPrev(newNode);
+                        }
                     }
                     count++;
                     current = current.getNext();
@@ -150,20 +73,42 @@ public class LinkedList<E> implements Iterable<E> {
     }
 
     /**
-     * delete the node at the provided index
+     * add the element to the end of the list
+     *
+     * @param element
+     */
+    void addToRear(E element) {
+        if (this.first == null) {
+            this.first = new Node(element);
+        } else {
+            Node current = first;
+            while (current.getNext() != null) {
+                current = current.getNext();
+            }
+            Node newNode = new Node(element);
+            current.setNext(newNode);
+            newNode.setPrev(current);
+
+        }
+    }
+
+    /**
+     * remove the element at the index
      *
      * @param index
      */
-    void remove(int index
-    ) {
+    void remove(int index) {
         if (index == 0 && this.first != null) {
             this.first = this.first.getNext();
         } else {
             int count = 0;
             Node current = this.first;
             while (current != null) {
+
                 if (count + 1 == index) {
-                    current.setNext(current.getNext().getNext());
+                    Node afterIndex = current.getNext().getNext();
+                    current.setNext(afterIndex);
+                    afterIndex.setPrev(current);
                 }
                 count++;
                 current = current.getNext();
@@ -171,6 +116,11 @@ public class LinkedList<E> implements Iterable<E> {
         }
     }
 
+    /**
+     * return the number of elements in the list
+     *
+     * @return
+     */
     int count() {
         int count = 0;
         if (this.first == null) {
@@ -183,6 +133,76 @@ public class LinkedList<E> implements Iterable<E> {
             }
             return count;
         }
+    }
+
+    /**
+     * returns the first node in the list
+     *
+     * @return
+     */
+    Node<E> getFirst() {
+        return this.first;
+    }
+
+    /**
+     * set the first element in the list
+     *
+     * @param element
+     */
+    void setFirst(E element) {
+        addToFront(element);
+    }
+
+    /**
+     * set new Node to be first in the list
+     *
+     * @param element
+     */
+    void addToFront(E element) {
+        if (this.first == null) {
+            this.first = new Node(element);
+        } else {
+            Node firstT = this.first;
+            Node newNode = new Node(element);
+            this.first = newNode;
+            this.first.setNext(firstT);
+            firstT.setPrev(newNode);
+        }
+    }
+
+    /**
+     * removes the element from the front of the list
+     */
+    void removeFromFront() {
+        if (this.first != null) {
+            Node temp = this.first;
+            this.first = temp.getNext();
+
+            temp.setPrev(null);
+            temp.setNext(null);
+        }
+    }
+
+    /**
+     * removes the element from the rear of the list
+     */
+    void removeFromRear() {
+        Node current = this.first;
+
+        if (this.first == null) {
+            return;
+        } else if (this.first.getNext() == null) {
+            this.first = null;
+            return;
+        } else if (this.first.getNext().getNext() == null) {
+            this.first.getNext().setNext(null);
+            return;
+        }
+
+        while (current.getNext().getNext() != null) {
+            current = current.getNext();
+        }
+        current.setNext(null);
     }
 
     @Override
@@ -198,4 +218,5 @@ public class LinkedList<E> implements Iterable<E> {
     public Iterator<E> iterator() {
         return new LinkedListIterator<>(this.first);
     }
+
 }
